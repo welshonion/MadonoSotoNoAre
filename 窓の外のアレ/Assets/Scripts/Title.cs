@@ -37,5 +37,4 @@ public class Title : MonoBehaviour {
         SceneManager.LoadScene("HighScoreScene");
     }
 
-
 }

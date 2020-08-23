@@ -16,8 +16,16 @@ public class ScrollObject : MonoBehaviour {
 
     private void Start()
     {
+
         ObjectSO = GameObject.Find("GameController");
-        ControllerSO = ObjectSO.GetComponent<GameController>();
+        if (ObjectSO != null)
+        {
+            ControllerSO = ObjectSO.GetComponent<GameController>();
+        }
+        else
+        {
+            StateSO = false;
+        }
 
 
         transform.Translate(firstPosition, 0, 0);
@@ -30,7 +38,10 @@ public class ScrollObject : MonoBehaviour {
 
         if (transform.position.x <= endPosition) ScrollEnd();
 
-        StateSO = ControllerSO.GetComponent<GameController>().StateGC;
+        if (ControllerSO != null)
+        {
+            StateSO = ControllerSO.GetComponent<GameController>().StateGC;
+        }
 
         //       Debug.Log(accelbool);
 

@@ -4,17 +4,18 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+public enum State
+{
+    Ready = 0,
+    Play = 1,
+    Pause = 2,
+    GameOver = 3
+}
+
 public class GameController : MonoBehaviour {
 
-    public enum State
-    {
-        Ready,
-        Play,
-        GameOver
-    }
-
+    //ForGameState
     public State state;
-    int score;
 
     public HumanController human;
     public GameObject blocks;
@@ -26,9 +27,14 @@ public class GameController : MonoBehaviour {
     public bool StateGC;
     public static bool TweetBool;
 
-    int ScoreSpace;
-    int RankingSpace;
-    int RankingSpace2;
+    //ForScore
+    int score;
+    int scoreForRanking;
+    int scoreForRankingTmp;
+
+    public static string RankingPref;
+    public static int RankingNum = 5;
+    public static int[] Ranking;
 
 
     //Hassyaon
@@ -134,6 +140,8 @@ public class GameController : MonoBehaviour {
     public void Backtitle()
     {
         Time.timeScale = 1;
+        getRanking();
+        setRanking();
         SceneManager.LoadScene("Start");
     }
 
@@ -153,23 +161,10 @@ public class GameController : MonoBehaviour {
         stateLabel.gameObject.SetActive(true);
         stateLabel.text = "GameOver";
 
-        RankingSpace2 = score;
 
-        for(int m=0; m < 5; m++)
-        {
-            if (RankingSpace2 > HighScoreSceneScript.Ranking[m])
-            {
-                RankingSpace = HighScoreSceneScript.Ranking[m];
-                
-                HighScoreSceneScript.Ranking[m] = RankingSpace2;
+        getRanking();
+        setRanking();
 
-                RankingSpace2 = RankingSpace;
-            }
-
-        }
-
-        PlayerPrefs.SetString(HighScoreSceneScript.RankingPref, HighScoreSceneScript.Ranking[0].ToString()+","+ HighScoreSceneScript.Ranking[1].ToString() + "," + HighScoreSceneScript.Ranking[2].ToString() + "," + HighScoreSceneScript.Ranking[3].ToString() + "," + HighScoreSceneScript.Ranking[4].ToString());
-        
         Invoke("Backtitle", 20.0f);
     }
 
@@ -190,5 +185,44 @@ public class GameController : MonoBehaviour {
         scoreLabel.text = "Score : " + score;
     }
 
-   
+    void getRanking()
+    {
+        string originalRanking = PlayerPrefs.GetString(RankingPref, "0,0,0,0,0");
+
+        if (originalRanking.Length > 0)
+        {
+            string[] RankingScore = originalRanking.Split(","[0]);
+
+            Ranking = new int[RankingNum];
+
+            for (int k = 0; k < originalRanking.Length && k < RankingNum; k++)
+            {
+                Ranking[k] = int.Parse(RankingScore[k]);
+            }
+        }
+    }
+
+    void setRanking()
+    {
+        scoreForRanking = score;
+
+        for (int m = 0; m < 5; m++)
+        {
+            if (scoreForRanking > Ranking[m])
+            {
+                scoreForRankingTmp = Ranking[m];
+
+                Ranking[m] = scoreForRanking;
+
+                scoreForRanking = scoreForRankingTmp;
+            }
+
+        }
+
+        PlayerPrefs.SetString(RankingPref, Ranking[0].ToString() + "," + Ranking[1].ToString() + "," + Ranking[2].ToString() + "," + Ranking[3].ToString() + "," + Ranking[4].ToString());
+
+        score = 0;
+    }
+
+
 }
